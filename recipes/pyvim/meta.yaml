@@ -1,0 +1,49 @@
+{% set name = "pyvim" %}
+{% set version = "3.0.3" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/pyvim-{{ version }}.tar.gz
+  sha256: 2a3506690f73a79dd02cdc45f872d3edf20a214d4c3666d12459e2ce5b644baa
+
+build:
+  entry_points:
+    - pyvim = pyvim.entry_points.run_pyvim:run
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+
+requirements:
+  host:
+    - python
+    - pip
+  run:
+    - python
+    - prompt-toolkit <3.1.0,>=2.0.0
+    - six
+    - pyflakes
+    - pygments
+    - docopt
+
+test:
+  imports:
+    - pyvim
+  commands:
+    - pip check
+    - pyvim --help
+  requires:
+    - pip
+
+about:
+  home: https://github.com/jonathanslenders/pyvim
+  dev_url: https://github.com/jonathanslenders/pyvim
+  summary: Pure Python Vi Implementation
+  license: BSD-3-Clause
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - eunos-1128
