@@ -1,0 +1,58 @@
+context:
+  name: mruby
+  version: "3.4.0"
+
+package:
+  name: ${{ name }}
+  version: ${{ version }}
+
+source:
+  url: https://github.com/${{ name }}/${{ name }}/archive/refs/tags/${{ version }}.tar.gz
+  sha256: 183711c7a26d932b5342e64860d16953f1cc6518d07b2c30a02937fb362563f8
+
+build:
+  number: 0
+  script:
+    - export LDFLAGS="-lc"
+    - make
+    - mkdir -p ${{ PREFIX }}/lib
+    - cp -r build/host/lib/*.a ${{ PREFIX }}/lib/
+    - mkdir -p ${{ PREFIX }}/bin
+    - cp -r build/host/bin/* ${{ PREFIX }}/bin/
+    - mkdir -p ${{ PREFIX }}/mrbgems ${{ PREFIX }}/mrblib
+    - cp -r build/host/mrbgems ${{ PREFIX }}/
+    - cp -r build/host/mrblib ${{ PREFIX }}/
+    - cp -r include ${{ PREFIX }}/
+
+requirements:
+  build:
+    - ${{ compiler('c') }}
+    # - ${{ stdlib('c') }}
+    - if: unix
+      then: bison
+    - make
+    - ruby
+  host:
+    - if: linux
+      then: readline
+  run_exports:
+    - ${{ pin_subpackage(name, upper_bound='x.x') }}
+
+tests:
+  - script:
+    - mruby -e "true"
+
+about:
+  homepage: https://mruby.org/
+  repository: https://github.com/mruby/mruby/
+  documentation: https://mruby.org/docs/
+  license: MIT
+  license_file: LICENSE
+  summary: "Lightweight implementation of the Ruby language"
+  description: >
+    mruby is the lightweight implementation of the Ruby language complying with part of the ISO standard.
+    mruby can be linked and embedded within your application.
+
+extra:
+  recipe-maintainers:
+    - eunos-1128
