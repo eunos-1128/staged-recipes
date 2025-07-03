@@ -1,0 +1,61 @@
+context:
+  name: Tortoize
+  version: "2.0.15"
+  sha256: 9d26b754d3081efeff1ec09aef24cc2d7335cbf3bff2dafb30ca2b97b6fe1175
+  build_number: 0
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  url: https://github.com/PDB-REDO/${{ name|lower }}/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: ${{ sha256 }}
+
+build:
+  number: ${{ build_number }}
+
+requirements:
+  build:
+    - ${{ compiler("cxx") }}
+    # - ${{ stdlib("c") }}
+    - cmake
+    - if: unix
+      then: make
+  host:
+    - bzip2
+    - catch2
+    - dssp
+    - eigen
+    - if: linux
+      then: libboost-devel
+    - icu >=75.1,<76.0a0
+    - nlohmann_json
+    - zeep
+    - zlib
+
+tests:
+  - script:
+      - ${{ name|lower }} --version
+      - ${{ name|lower }} --help
+      - ${{ name|lower }} test/1cbs.cif.gz
+    files:
+      source:
+        - test/1cbs.cif.gz
+
+about:
+  homepage: https://github.com/PDB-REDO/tortoize
+  repository: https://github.com/PDB-REDO/tortoize
+  documentation: https://github.com/PDB-REDO/tortoize/blob/trunk/doc/tortoize.pdf
+  license: BSD-2-Clause
+  license_file: LICENSE
+  summary: "Application to calculate ramachandran z-scores"
+  description: |
+    Tortoize validates protein structure models by checking the Ramachandran plot and side-chain rotamer
+    distributions. Quality Z-scores are given at the residue level and at the model level (ramachandran-z and
+    torsions-z). Higher scores are better. To compare models or to describe the reliability of the model Z-scores
+    jackknife- based standard deviations are also reported (ramachandran-jackknife-sd and torsion-jackknife-sd).
+
+extra:
+  recipe-maintainers:
+    - eunos-1128
