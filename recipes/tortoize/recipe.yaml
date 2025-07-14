@@ -18,7 +18,7 @@ build:
 requirements:
   build:
     - ${{ compiler("cxx") }}
-    # - ${{ stdlib("c") }}
+    - ${{ stdlib("c") }}
     - cmake
     - if: unix
       then: make
@@ -29,9 +29,10 @@ requirements:
     - eigen
     - if: linux
       then: libboost-devel
-    - icu >=75.1,<76.0a0
     - nlohmann_json
-    - zeep
+    - libcifpp
+    - libmcfp
+    - libzeep
     - zlib
 
 tests:
