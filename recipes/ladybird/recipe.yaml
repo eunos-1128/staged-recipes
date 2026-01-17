@@ -1,0 +1,108 @@
+context:
+  name: Ladybird
+  version: 61a344a718295322d70750d431c350e67737396a
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  git: https://github.com/LadybirdBrowser/${{ name|lower }}.git
+  rev: ${{ version }}
+
+build:
+  number: 0
+  skip: win
+  script:
+    - set -exo pipefail
+    - >
+      cmake -S . -B build -G Ninja
+        ${CMAKE_ARGS}
+        -DBUILD_SHARED_LIBS=ON
+        -DENABLE_GUI_TARGETS=ON
+        -DENABLE_INSTALL_HEADERS=ON
+    - cmake --build build --parallel ${CPU_COUNT}
+    - cmake --install build --parallel ${CPU_COUNT}
+
+requirements:
+  build:
+    - ${{ compiler("c") }}
+    - ${{ compiler("cxx") }}
+    # - ${{ stdlib("c") }}
+    - autoconf-archive
+    - automake
+    - ccache
+    - cmake
+    - libtool
+    - nasm
+    - ninja
+    - patch
+    - pkg-config
+    - python
+    - tar
+    - unzip
+    - zip
+  host:
+    - angle
+    - cpptrace
+    - curl
+    - dbus
+    - fast_float
+    - ffmpeg
+    - harfbuzz
+    - icu
+    - libavif
+    - libjpeg-turbo
+    - libjxl
+    - libpng
+    - libtiff
+    - libtommath
+    - libvulkan-headers
+    - libvulkan-loader
+    - libwebp
+    - libxml2-devel
+    - openssl
+    - qt6-main
+    - qt6-wayland
+    - skia
+    - sdl3
+    - simdjson
+    - simdutf
+    - sqlite
+    - woff2
+    - zlib
+    - zstd
+    - if: linux
+      then:
+        - dbus
+        - fontconfig
+        - libglvnd-devel
+        - libdrm
+        - libxcb
+  run:
+    if: linux
+    then: mesalib
+
+  # run_exports: ${{ pin_subpackage(name|lower, exact=True) }}
+
+tests:
+  - script:
+      - ladybird --help | grep -i "ladybird"
+      - ladybird --headless=manual about:blank &
+      - sleep 2
+      - pkill -f ladybird || true
+      - test -f ${PREFIX}/bin/ladybird
+      - test -f ${PREFIX}/lib/liblagom-web${SHLIB_EXT}
+
+about:
+  homepage: "https://ladybird.dev"
+  summary: "Truly independent web browser"
+  description: "Ladybird is a truly independent web browser, using a novel engine based on web standards."
+  license: BSD-2-Clause
+  license_file: LICENSE
+  repository: https://github.com/LadybirdBrowser/ladybird
+  documentation: https://github.com/LadybirdBrowser/ladybird/tree/${{ version }}/Documentation
+
+extra:
+  recipe-maintainers:
+    - eunos-1128
