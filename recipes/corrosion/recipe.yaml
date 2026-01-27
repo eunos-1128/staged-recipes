@@ -14,8 +14,11 @@ build:
   script:
     - if: unix
       then: |
+        export CARGO_HOME="${SRC_DIR}/.cargo"   # または $PWD/.cargo
+        mkdir -p "$CARGO_HOME"
         cmake -S . -B build \
           ${CMAKE_ARGS} \
+          -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -pthread" \
           -DCORROSION_NO_WARN_PARSE_TARGET_TRIPLE_FAILED=ON \
           -DCORROSION_BUILD_TESTS=ON
         cmake --build build --parallel ${CPU_COUNT}
@@ -36,7 +39,7 @@ requirements:
     - ${{ compiler("c") }}
     - ${{ compiler("cxx") }}
     - ${{ compiler("rust") }}
-    - ${{ stdlib("c") }}
+    #- ${{ stdlib("c") }}
     - cmake
     - rust-src
     - if: unix
