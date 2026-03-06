@@ -41,7 +41,7 @@ requirements:
     - libzeep
     - maartens_resource_compiler
   run: []
-  run_exports: []  # No shared libraries to worry about
+  run_exports: []
 
 tests:
   - script:
