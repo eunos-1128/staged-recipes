@@ -34,12 +34,20 @@ requirements:
     - pkg-config
     - sphinx
   host:
+    - cryptopp
+    - expat
+    - freetype
+    - glib
+    - gtk4
+    - libboost-devel
+    - libcanberra
     - libgxrio
     - libmcfp
     - libmgui
     - libpinch
     - libzeep
     - maartens_resource_compiler
+    - zlib
   run: []
   run_exports: []
 
