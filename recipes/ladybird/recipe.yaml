@@ -37,7 +37,7 @@ requirements:
     - ninja
     - patch
     - pkg-config
-    - python
+    - python *
     - tar
     - unzip
     - zip
@@ -85,13 +85,17 @@ requirements:
     - ${{ pin_subpackage(name|lower, upper_bound="x.x.x") }}
 
 tests:
+  - package_contents:
+      bin:
+        - ladybird
+      lib:
+        - lagom-web
+
   - script:
       - ladybird --help | grep -i "ladybird"
       - ladybird --headless=manual about:blank &
       - sleep 2
       - pkill -f ladybird || true
-      - test -f ${PREFIX}/bin/ladybird
-      - test -f ${PREFIX}/lib/liblagom-web${SHLIB_EXT}
 
 about:
   homepage: "https://ladybird.dev"
