@@ -26,7 +26,6 @@ build:
 
 requirements:
   build:
-    - ${{ compiler("c") }}
     - ${{ compiler("cxx") }}
     # - ${{ stdlib("c") }}
     - autoconf-archive
@@ -43,7 +42,7 @@ requirements:
     - unzip
     - zip
   host:
-    - angle
+    # - angle
     - cpptrace
     - curl
     - dbus
@@ -63,8 +62,7 @@ requirements:
     - libxml2-devel
     - openssl
     - qt6-main
-    - qt6-wayland
-    - skia
+    # - skia
     - sdl3
     - simdjson
     - simdutf
@@ -79,11 +77,12 @@ requirements:
         - libglvnd-devel
         - libdrm
         - libxcb
+        - qt6-wayland
   run:
-    if: linux
-    then: mesalib
-
-  # run_exports: ${{ pin_subpackage(name|lower, exact=True) }}
+    - ${{ "mesalib" if linux }}
+    - ${{ "moltenvk" if osx }}
+  run_exports:
+    - ${{ pin_subpackage(name|lower, upper_bound="x.x.x") }}
 
 tests:
   - script:
