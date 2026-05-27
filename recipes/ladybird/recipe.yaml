@@ -27,11 +27,14 @@ build:
 requirements:
   build:
     - ${{ compiler("cxx") }}
-    # - ${{ stdlib("c") }}
+    - ${{ compiler("rust") }}
+    - ${{ stdlib("c") }}
     - autoconf-archive
     - automake
+    - cargo-bundle-licenses
     - ccache
     - cmake
+    - corrosion
     - libtool
     - nasm
     - ninja
