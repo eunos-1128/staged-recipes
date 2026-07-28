@@ -1,0 +1,43 @@
+schema_version: 1
+
+context:
+  version: "104"
+
+package:
+  name: zigmod
+  version: ${{ version }}
+
+source:
+  url: https://github.com/nektro/zigmod/archive/refs/tags/r${{ version }}.tar.gz
+  sha256: ae9d845a67750d5f7fae685768cc3bc9bf6de059b767502ffdd8064c5d8e4c96
+
+build:
+  number: 0
+  script:
+    - zig build -Dmode=ReleaseSafe -Dstrip=true -Dtag=${{ version }} --prefix ${{ PREFIX }}
+
+requirements:
+  build:
+    - ${{ stdlib("c") }}
+    - zig >=0.16.0,<0.17
+
+tests:
+  - package_contents:
+      bin:
+        - zigmod
+    strict: true
+  - script:
+      - zigmod version
+
+about:
+  homepage: https://nektro.github.io/zigmod
+  repository: https://github.com/nektro/zigmod
+  documentation: https://github.com/nektro/zigmod/tree/r${{ version }}/docs
+  license: MIT
+  license_file: LICENSE
+  summary: "📦 A package manager for the Zig programming language."
+  description: "Zigmod is a prototype package manager for the Zig programming language."
+
+extra:
+  recipe-maintainers:
+    - eunos-1128
