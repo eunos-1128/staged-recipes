@@ -141,12 +141,14 @@ outputs:
               - sh -c 'ldd "${PREFIX}/libexec/patinae/bin/patinae" > ldd.txt && ! grep -q "not found" ldd.txt'
           - if: osx
             then:
-              - sh -c 'otool -L "${PREFIX}/libexec/patinae/bin/patinae" > otool.txt && ! grep -qi "not found" otool.txt'
+              - python test_runtime_deps.py
           - if: win
             then:
-              - dumpbin /DEPENDENTS "%PREFIX%\libexec\patinae\bin\patinae.exe" > dumpbin.txt
-              - findstr /C:"not found" dumpbin.txt >nul && (echo Missing runtime dependency detected.& exit /b 1) || echo Runtime dependencies resolved.
+              - python test_runtime_deps.py
           - python -c "import patinae; import patinae.widget"
+        files:
+          recipe:
+            - test_runtime_deps.py
         requirements:
           run:
             - ${{ compiler('c') if win }} # Required to use `dumpbin` for Windows
