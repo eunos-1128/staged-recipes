@@ -122,3 +122,11 @@ export PATINAE_PLUGIN_DIR
 exec "${here}/../libexec/patinae/bin/patinae" "$@"
 EOF
 chmod +x "${PREFIX}/bin/patinae"
+
+# Register a menuinst desktop shortcut so the installed icon launches the
+# `patinae` wrapper (and thus picks up PATINAE_PLUGIN_DIR) rather than the
+# raw libexec binary.
+mkdir -p "${PREFIX}/Menu"
+sed -e "s/__PKG_VERSION__/${PKG_VERSION}/g" "${RECIPE_DIR}/menu.json" > "${PREFIX}/Menu/patinae_menu.json"
+cp "${SRC_DIR}/images/patinae.png" "${PREFIX}/Menu/patinae.png"
+cp "${SRC_DIR}/images/patinae.ico" "${PREFIX}/Menu/patinae.ico"

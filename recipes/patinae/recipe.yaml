@@ -102,12 +102,15 @@ outputs:
     build:
       files:
         - libexec/patinae/**
+        - Menu/patinae_menu.json
+        - Menu/patinae.png
         - if: unix
           then:
             - bin/patinae
         - if: win
           then:
             - Scripts/patinae.bat
+            - Menu/patinae.ico
     requirements:
       run:
         - ${{ pin_subpackage('python-patinae', exact=True) }}
@@ -131,6 +134,7 @@ outputs:
             - libexec/patinae/plugins/*ipc_plugin*
             - libexec/patinae/plugins/*python_plugin*
             - libexec/patinae/plugins/*raytracer_plugin*
+            - Menu/patinae_menu.json
       - script:
           - if: linux
             then:
