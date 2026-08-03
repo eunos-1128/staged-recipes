@@ -131,10 +131,11 @@ outputs:
               - sh -c 'ldd "${PREFIX}/libexec/patinae/bin/patinae" > ldd.txt && ! grep -q "not found" ldd.txt'
           - if: osx
             then:
-              - otool -L "${PREFIX}/libexec/patinae/bin/patinae"
+              - sh -c 'otool -L "${PREFIX}/libexec/patinae/bin/patinae" > otool.txt && ! grep -qi "not found" otool.txt'
           - if: win
             then:
-              - dumpbin /DEPENDENTS "%PREFIX%\libexec\patinae\bin\patinae.exe"
+              - dumpbin /DEPENDENTS "%PREFIX%\libexec\patinae\bin\patinae.exe" > dumpbin.txt
+              - findstr /C:"not found" dumpbin.txt && exit /b 1 || exit /b 0
           - python -c "import patinae; import patinae.widget"
         requirements:
           run:
