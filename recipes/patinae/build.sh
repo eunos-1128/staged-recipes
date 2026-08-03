@@ -12,8 +12,12 @@ fi
 
 # Generate Rust license metadata for all shipped Rust workspaces.
 cargo-bundle-licenses --format yaml --output THIRDPARTY.yml
-( cd python && cargo-bundle-licenses --format yaml --output ../THIRDPARTY-python.yml )
-( cd web && cargo-bundle-licenses --format yaml --output ../THIRDPARTY-web.yml )
+pushd python > /dev/null
+cargo-bundle-licenses --format yaml --output ../THIRDPARTY-python.yml
+popd > /dev/null
+pushd web > /dev/null
+cargo-bundle-licenses --format yaml --output ../THIRDPARTY-web.yml
+popd > /dev/null
 
 # Resolve Cargo target and release directories.
 cargo_args=()
