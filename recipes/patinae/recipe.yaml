@@ -128,7 +128,7 @@ outputs:
       - script:
           - if: linux
             then:
-              - sh -c 'ldd "${PREFIX}/libexec/patinae/bin/patinae" | (! grep "not found")'
+              - sh -c 'ldd "${PREFIX}/libexec/patinae/bin/patinae" > ldd.txt && ! grep -q "not found" ldd.txt'
               - "${PREFIX}/libexec/patinae/bin/patinae" --version
           - if: osx
             then:
