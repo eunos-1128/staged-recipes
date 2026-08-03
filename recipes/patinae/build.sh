@@ -111,7 +111,7 @@ fi
 # Install the user-facing desktop wrapper as `patinae`.
 cat > "${PREFIX}/bin/patinae" <<'EOF'
 #!/bin/sh
-here="$(dirname "$(readlink -f "$0")")"
+here="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 PATINAE_PLUGIN_DIR="${PATINAE_PLUGIN_DIR:-${here}/../libexec/patinae/plugins}"
 export PATINAE_PLUGIN_DIR
 exec "${here}/../libexec/patinae/bin/patinae" "$@"
