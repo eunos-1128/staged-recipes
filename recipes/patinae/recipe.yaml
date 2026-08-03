@@ -84,9 +84,15 @@ outputs:
       - script:
           - patinae-cli --help
           - python test_widget_assets.py
+          - pytest -v python/tests/test_labels.py
         files:
           recipe:
             - test_widget_assets.py
+          source:
+            - python/tests/test_labels.py
+        requirements:
+          run:
+            - pytest
     about:
       summary: Python bindings and Jupyter widget for Patinae
 
