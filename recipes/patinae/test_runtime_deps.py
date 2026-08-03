@@ -21,9 +21,9 @@ def run_text(*cmd: str) -> str:
 def iter_targets() -> list[Path]:
     targets = [MAIN_BIN]
     if sys.platform == "darwin":
-        targets.extend(sorted(p for p in PLUGIN_DIR.glob("*.dylib") if p.is_file()))
+        targets.extend(sorted(PLUGIN_DIR.glob("*.dylib")))
     elif sys.platform == "win32":
-        targets.extend(sorted(p for p in PLUGIN_DIR.glob("*.dll") if p.is_file()))
+        targets.extend(sorted(PLUGIN_DIR.glob("*.dll")))
     return targets
 
 
