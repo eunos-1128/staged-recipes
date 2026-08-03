@@ -145,7 +145,7 @@ outputs:
           - if: win
             then:
               - dumpbin /DEPENDENTS "%PREFIX%\libexec\patinae\bin\patinae.exe" > dumpbin.txt
-              - findstr /C:"not found" dumpbin.txt && exit /b 1 || exit /b 0
+              - findstr /C:"not found" dumpbin.txt >nul && (echo Missing runtime dependency detected.& exit /b 1) || echo Runtime dependencies resolved.
           - python -c "import patinae; import patinae.widget"
         requirements:
           run:
