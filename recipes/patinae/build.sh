@@ -10,8 +10,10 @@ if [[ "${target_platform}" == linux-* ]]; then
   export CFLAGS="${CFLAGS:-} -D_GNU_SOURCE"
 fi
 
-# Generate Rust license metadata.
+# Generate Rust license metadata for all shipped Rust workspaces.
 cargo-bundle-licenses --format yaml --output THIRDPARTY.yml
+( cd python && cargo-bundle-licenses --format yaml --output ../THIRDPARTY-python.yml )
+( cd web && cargo-bundle-licenses --format yaml --output ../THIRDPARTY-web.yml )
 
 # Resolve Cargo target and release directories.
 cargo_args=()
@@ -52,6 +54,10 @@ install -m 755 "${plugins[@]}" "${PREFIX}/libexec/patinae/plugins/"
 # Prepare web dependencies and JavaScript license metadata.
 pushd web
 
+#
+# NOTE: web/package.json currently has no production dependencies, so this
+# branch is expected to stay false and keep an empty file. Keep the guard for
+# forward-compatibility if upstream later adds runtime web dependencies.
 if jq -e '((.dependencies // {}) + (.optionalDependencies // {})) | length > 0' package.json > /dev/null; then
   pnpm install --prod --ignore-scripts
   pnpm-licenses generate-disclaimer --prod --output-file=third-party-licenses.txt
@@ -62,7 +68,8 @@ fi
 
 # Install full web build dependencies without running package scripts.
 rm -rf node_modules
-pnpm install --ignore-scripts --no-frozen-lockfile
+pnpm import
+pnpm install --ignore-scripts --frozen-lockfile
 
 # Build the WebAssembly viewer without inheriting native Rust linker flags.
 (
@@ -73,7 +80,7 @@ pnpm install --ignore-scripts --no-frozen-lockfile
   unset LDFLAGS
   unset CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS
   unset CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER
-  "${BUILD_PREFIX}/bin/wasm-pack" build --target web --out-dir pkg --no-opt
+  "${BUILD_PREFIX}/bin/wasm-pack" build --target web --out-dir pkg --no-opt --mode no-install
 )
 
 # Bundle the web viewer assets with Vite.
@@ -97,18 +104,16 @@ maturin build --release \
 if [[ -f "${PREFIX}/bin/patinae" ]]; then
   mv "${PREFIX}/bin/patinae" "${PREFIX}/bin/patinae-cli"
 else
-  cat > "${PREFIX}/bin/patinae-cli" <<'EOF'
-#!/bin/sh
-exec python -m patinae._cli "$@"
-EOF
-  chmod +x "${PREFIX}/bin/patinae-cli"
+  echo "Expected pip-installed console script 'patinae' entry point not found." >&2
+  exit 1
 fi
 
 # Install the user-facing desktop wrapper as `patinae`.
 cat > "${PREFIX}/bin/patinae" <<'EOF'
 #!/bin/sh
-PATINAE_PLUGIN_DIR="${PATINAE_PLUGIN_DIR:-${CONDA_PREFIX}/libexec/patinae/plugins}"
+here="$(dirname "$(readlink -f "$0")")"
+PATINAE_PLUGIN_DIR="${PATINAE_PLUGIN_DIR:-${here}/../libexec/patinae/plugins}"
 export PATINAE_PLUGIN_DIR
-exec "${CONDA_PREFIX}/libexec/patinae/bin/patinae" "$@"
+exec "${here}/../libexec/patinae/bin/patinae" "$@"
 EOF
 chmod +x "${PREFIX}/bin/patinae"
