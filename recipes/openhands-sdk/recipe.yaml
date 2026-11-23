@@ -11,6 +11,8 @@ package:
 source:
   - url: https://pypi.org/packages/source/o/openhands-sdk/openhands_sdk-${{ version }}.tar.gz
     sha256: 54cc3080d1680623493bf2ea1bd14af7a3a3adbc82dc30fa6d2e5e2b7be68da6
+    patches:
+      - optional-laminar.patch
   # The sdist omits LICENSE; this is the file from the v1.63.1 commit.
   - url: https://raw.githubusercontent.com/OpenHands/software-agent-sdk/722e5d403cf75d4e032b79296cfaf178f8678a93/LICENSE
     sha256: 14a9b631c658eee682c6c2973525fbdf808c3457176bc47513052c559cc5ce86
@@ -49,7 +51,6 @@ requirements:
     - python-json-logger >=4.2.0
     - tenacity >=9.1.2
     - websockets >=12
-    - lmnr >=0.7.60,<0.8.0
     - tree_sitter >=0.26.1
     - tree-sitter-bash >=0.25
 
@@ -63,6 +64,13 @@ tests:
         - openhands.sdk.conversation
         - openhands.sdk.llm
       pip_check: true
+  - script: python test_no_lmnr.py
+    requirements:
+      run:
+        - python ${{ python_min }}.*
+    files:
+      recipe:
+        - test_no_lmnr.py
 
 about:
   homepage: https://github.com/OpenHands/software-agent-sdk
@@ -70,6 +78,7 @@ about:
   description: |
     A composable Python SDK for building agents, tools, and conversations.
     This package provides the OpenHands execution core without the Canvas UI.
+    Laminar tracing is an optional dependency and is not included in this build.
   license: MIT
   license_file: LICENSE
   documentation: https://docs.openhands.dev/sdk
