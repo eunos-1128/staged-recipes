@@ -1,0 +1,73 @@
+schema_version: 1
+
+context:
+  version: "1.63.1"
+  python_min: "3.12"
+
+package:
+  name: openhands-agent-server
+  version: ${{ version }}
+
+source:
+  - url: https://pypi.org/packages/source/o/openhands-agent-server/openhands_agent_server-${{ version }}.tar.gz
+    sha256: 60170c858b72d9cd0f5318887ae046031debf305d8971dab70b859c0d5d3b74d
+  # The sdist omits LICENSE; this is the file from the v1.63.1 commit.
+  - url: https://raw.githubusercontent.com/OpenHands/software-agent-sdk/722e5d403cf75d4e032b79296cfaf178f8678a93/LICENSE
+    sha256: 14a9b631c658eee682c6c2973525fbdf808c3457176bc47513052c559cc5ce86
+    file_name: LICENSE
+
+build:
+  number: 0
+  noarch: python
+  script: python -m pip install . -vv --no-deps --no-build-isolation
+  python:
+    entry_points:
+      - agent-server = openhands.agent_server.__main__:main
+
+requirements:
+  host:
+    - python ${{ python_min }}.*
+    - pip
+    - setuptools >=84.2.1
+    - wheel
+  run:
+    - python >=${{ python_min }}
+    - aiosqlite >=0.22.1
+    - alembic >=1.20.1
+    - certifi >=2026.10.19
+    - docker-py >=7.2.0,<8
+    - fastapi >=0.104
+    - openhands-sdk
+    - openhands-tools
+    - openai >=2.33.0,<3
+    - pydantic >=2.14.3
+    - sqlalchemy >=2.1.8
+    - uvicorn >=0.54.0
+    - websockets >=12
+    - wsproto >=1.3.2
+
+tests:
+  - python:
+      python_version:
+        - ${{ python_min }}.*
+        - "*"
+      imports:
+        - openhands.agent_server
+      pip_check: true
+  - script:
+      - agent-server --help
+
+about:
+  homepage: https://github.com/OpenHands/software-agent-sdk
+  summary: REST and WebSocket server for OpenHands AI agents
+  description: |
+    An API server for running OpenHands agents and managing conversations.
+    It can serve as the backend for Agent Canvas or other API clients.
+  license: MIT
+  license_file: LICENSE
+  documentation: https://docs.openhands.dev/sdk
+  repository: https://github.com/OpenHands/software-agent-sdk
+
+extra:
+  recipe-maintainers:
+    - eunos-1128
