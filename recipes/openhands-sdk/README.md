@@ -3,15 +3,15 @@
 This is a preparatory recipe for the published PyPI release 1.63.1, not
 the changing dependency metadata on upstream `main`.
 
-Before submitting this recipe for merge:
+The LiteLLM dependency blocker is resolved. The conda-forge
+[v1.108.x backfill PR](https://github.com/conda-forge/litellm-feedstock/pull/489)
+was merged, and the public channel supplies releases satisfying
+`litellm >=1.108.3,<1.109`. Validation below used public LiteLLM 1.108.20.
 
-- Make `litellm >=1.108.3,<1.109` available on conda-forge. The newer
-  published conda builds do not satisfy this upper bound; do not loosen it
-  without upstream compatibility evidence.
-- Run the package import and `pip check` tests with the completed dependency
-  set. Rendering and linting alone do not establish installability.
+This SDK recipe is ready for review of the downstream optional-tracing patch.
+Submit the SDK separately from Agent Server, whose `openhands-tools`
+dependency still needs packaging.
 
-Availability was checked against the conda-forge Anaconda API on 2026-11-23.
 `tree-sitter` on PyPI maps to `tree_sitter` on conda-forge. The `lua` and
 `socks` extras are represented explicitly by `lupa` and `socksio`.
 Optional boto3, Vertex and ToolShield extras are not enabled.
@@ -49,19 +49,26 @@ each tracing environment variable, optional-dependency metadata, and the
 initialization path with a mocked Laminar module. It does not validate the
 real Laminar service.
 
-## Local validation (2026-11-23)
+## Local validation (2026-11-28)
 
 - conda-smithy 2026.11.6 lint: passed.
-- rattler-build 0.81.0 rendering: passed.
-- Source download, checksum verification and noarch package generation on
-  osx-arm64: passed.
-- Conda package tests: not executed; test environment solving failed because `litellm >=1.108.3,<1.109`
-  was unavailable. This is not a passing end-to-end build.
-- Separate Python 3.12 environment using the patched release source and PyPI
-  dependencies: `test_no_lmnr.py` passed with neither `lmnr` nor its proxy
-  installed; `uv pip check` passed for all 114 installed packages.
-  This validates the patch behavior, not conda-forge dependency availability.
-- The generated conda artifact metadata was inspected: `lmnr` is absent
-  from conda runtime dependencies and is optional in Python distribution metadata.
-  The same regression script also passed against its extracted Python files using
-  the separate PyPI dependency environment (not a conda installation test).
+- rattler-build 0.81.0 full build on osx-arm64: passed, including source
+  checksum verification, patch application and noarch package generation.
+- All build and runtime dependencies came from the public conda-forge channel;
+  only the SDK under test was built locally. No locally built LiteLLM or
+  PyPI-installed runtime dependencies were used.
+- The solver selected LiteLLM 1.108.20. Import tests and `pip check`
+  passed with Python 3.12 and Python 3.14 (the `"*"` test variant).
+- `test_no_lmnr.py` passed in the conda Python 3.12 environment:
+  SDK/ACP imports, a local conversation with a mocked model response,
+  tracing-disabled sync/async helpers, actionable errors for each tracing
+  environment variable, optional dependency metadata and mocked Laminar
+  initialization. Neither Laminar nor its proxy was installed.
+- Linux and Windows builds, live model calls and the real Laminar service
+  were not tested locally.
+
+Reproduction (the output directory must not contain a local LiteLLM package):
+
+```sh
+rattler-build build -r recipes/openhands-sdk/recipe.yaml   -c conda-forge --output-dir sdk-public-validation
+```
