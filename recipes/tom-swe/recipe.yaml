@@ -53,9 +53,10 @@ about:
   homepage: https://github.com/OpenHands/ToM-SWE
   summary: Theory of Mind modeling for software engineering assistants
   license: MIT
-  # Submission blocker: upstream declares MIT but neither the v1.0.3 sdist
-  # nor its release tag contains the license text. Add license_file and an
-  # upstream-provided license source before submitting this recipe for merge.
+  # Upstream declares MIT in pyproject.toml but omits the license text.
+  # Standard SPDX template, with attribution placeholders left unchanged:
+  # https://raw.githubusercontent.com/spdx/license-list-data/cc4fe1ac462bd3ad3c81a07234baf7d9541ee871/text/MIT.txt
+  license_file: LICENSE
   documentation: https://github.com/OpenHands/ToM-SWE#readme
   repository: https://github.com/OpenHands/ToM-SWE
 
