@@ -1,0 +1,64 @@
+schema_version: 1
+
+context:
+  version: "1.0.3"
+  python_min: "3.10"
+
+package:
+  name: tom-swe
+  version: ${{ version }}
+
+source:
+  url: https://pypi.org/packages/source/t/tom-swe/tom_swe-${{ version }}.tar.gz
+  sha256: 57c97d0104e563f15bd39edaf2aa6ac4c3e9444afd437fb92458700d22c6c0f5
+
+build:
+  number: 0
+  noarch: python
+  script: python -m pip install . -vv --no-deps --no-build-isolation
+
+requirements:
+  host:
+    - python ${{ python_min }}.*
+    - pip
+    - hatchling
+  run:
+    - python >=${{ python_min }}
+    - jinja2 >=3.0.0
+    - json-repair >=0.1.0
+    - litellm >=1.0.0
+    - pydantic >=2.0.0
+    - python-dotenv >=1.0.0
+    - tiktoken >=0.8.0
+    - tqdm >=4.65.0
+
+tests:
+  - python:
+      python_version:
+        - ${{ python_min }}.*
+        - "3.12.*"
+      imports:
+        - tom_swe
+        - tom_swe.tom_agent
+        - tom_swe.generation.output_parsers
+        - tom_swe.generation.bm25_fallback
+      pip_check: true
+  - script:
+      - python -c "from tom_swe.prompts.manager import PromptManager; p = PromptManager(); assert set(p.list_templates()) == {'give_suggestions', 'message_condensation', 'session_analysis', 'sleeptime_compute', 'user_analysis'}; [p.env.get_template(n + '.jinja2') for n in p.list_templates()]"
+    requirements:
+      run:
+        - python 3.12.*
+
+about:
+  homepage: https://github.com/OpenHands/ToM-SWE
+  summary: Theory of Mind modeling for software engineering assistants
+  license: MIT
+  # Submission blocker: upstream declares MIT but neither the v1.0.3 sdist
+  # nor its release tag contains the license text. Add license_file and an
+  # upstream-provided license source before submitting this recipe for merge.
+  documentation: https://github.com/OpenHands/ToM-SWE#readme
+  repository: https://github.com/OpenHands/ToM-SWE
+
+extra:
+  recipe-maintainers:
+    - eunos-1128
